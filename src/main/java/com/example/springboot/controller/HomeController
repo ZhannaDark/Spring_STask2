@@ -1,0 +1,81 @@
+package com.example.springboot.controller;
+
+import com.example.springboot.model.ApplicationRequest;
+import com.example.springboot.repository.RequestRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
+
+@Controller
+@RequiredArgsConstructor
+public class HomeController {
+
+
+    private final RequestRepository repository;
+
+    @GetMapping(value = "/")
+    public String requestPage(Model model){
+        List<ApplicationRequest> appreq = repository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        model.addAttribute("zaprosy", appreq);
+        return "index";
+    }
+
+    @GetMapping(value = "/add-req")
+    public String addReqPage(Model model) {
+        return "addReq";
+    }
+
+    @PostMapping(value = "/add-req")
+    public String addReq(ApplicationRequest request) {
+        request.setHandled(false);
+        repository.save(request);
+        return "redirect:/";
+    }
+
+    @GetMapping(value = "/new-req")
+    public String newReqPage(Model model) {
+        List<ApplicationRequest> requests = repository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        model.addAttribute("newrequest", requests);
+        return "newReq";
+    }
+
+    @GetMapping(value = "/alr-req")
+    public String nalrReqPage(Model model) {
+        List<ApplicationRequest> requests = repository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        model.addAttribute("newrequest", requests);
+        return "alreadyHandled";
+    }
+
+    @GetMapping(value = "/details/{id}")
+    public String reqDetails(@PathVariable(name = "id") Long id, Model model) {
+        ApplicationRequest reqdet = repository.findById(id).orElse(null);
+        model.addAttribute("reqdetails", reqdet);
+        return "details";
+    }
+
+    @PostMapping(value = "/delete-req")
+    public String deleteReq(@RequestParam(name = "id") Long id) {
+        repository.deleteById(id);
+        return "redirect:/";
+    }
+
+    @PostMapping(value = "/handle-req")
+    public String handleOrderPage(@RequestParam(name = "id") Long id){
+        ApplicationRequest applicationRequest = repository.findById(id).orElse(null);
+        if (applicationRequest != null){
+            if (!applicationRequest.isHandled()){
+                applicationRequest.setHandled(true);
+            }
+            repository.save(applicationRequest);
+        }
+        return "redirect:/";
+    }
+}
+
