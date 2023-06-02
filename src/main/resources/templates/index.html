@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th = "http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="main_layout.html">
+    <div layout:fragment="siteContent">
+        <div class="container d-flex flex-wrap justify-content-between">
+            <div class="card col-12 mt-3" style="width: 33rem" th:each = "req : ${zaprosy}">
+                <div class="card-body">
+                        <h4 th:unless="${req.isHandled()}"><span class="fw-bold fs-4" style="color: red">*(Новая)</span>Заявка от <span class="fw-bold" th:text="${req.userName}"></span></h4>
+                        <h4 th:if="${req.isHandled()}">Заявка от <span class="fw-bold fs-4" th:text="${req.userName}"></span></h4>
+                        <p style="font-size: small">Курс: <span style="font-weight: 500" th:text="${req.courseName}"></span></p>
+                        <p style="font-size: small; line-height: 0.7em"><span th:text="${req.commentary}"></span></p>
+                    <div class="d-flex">
+                        <strong class="me-4">Тел: <span th:text="${req.phone}"></span></strong>
+                        <a class="text-decoration-none" th:href="@{'/details/' + ${req.id}}">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>
